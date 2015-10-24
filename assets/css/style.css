@@ -421,7 +421,7 @@ strong {
   font-weight: 600; }
 
 blockquote {
-  margin: 1.5em 0 1.5em 2em;
+  margin: 0.2em 0 0.2em 2em;
   padding-left: .5em;
   border-left: 5px solid #e5e8ec; }
 
@@ -962,7 +962,7 @@ pre > code {
 /* Inline code */
 :not(pre) > code {
   padding: .25em .5em .1em;
-  color: black;
+  color: #FF2957;
   font: .85em Consolas, Monaco, 'Andale Mono', monospace;
   background: #fafafa;
   border: 1px solid #e5e8ec;
