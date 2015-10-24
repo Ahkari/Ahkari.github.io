@@ -24,9 +24,9 @@ description: 高性能javascript读书笔记，将不知道的知识点记下来
 >	    <script src="./load.js"></script> //window.onload = function(){ console.log('页面onload事件触发') ; }
 >	    </body>
 
-    普通<script>执行
-    defer<script>执行
-    页面onload事件执行
+>		普通<script>执行
+>		defer<script>执行
+>	    页面onload事件执行
 
   * 低版本的IE支持含defer属性的标签里写内联js，而现代浏览器遵循HTML5规范，defer只对含src属性的`<script>`起作用，即必须为外链js
 

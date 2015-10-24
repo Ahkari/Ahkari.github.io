@@ -394,7 +394,14 @@ a {
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: 400; }
-
+h1{
+  color: #777;
+  font-weight: 700;
+}
+h3{
+  font-weight: 400;
+  color: #2070B7;
+}
 #post__title {
   margin: 0;
   padding-top: 1.1em;
@@ -930,6 +937,8 @@ pre {
   border: 1px solid #e5e8ec;
   border-radius: 3px;
   background-color: #fdfdfd;
+  background-color: #222;
+  color: #FFD2C8;
   background-image: -webkit-linear-gradient(transparent 50%, rgba(69, 142, 209, 0.04) 50%);
   background-image: -moz-linear-gradient(transparent 50%, rgba(69, 142, 209, 0.04) 50%);
   background-image: -ms-linear-gradient(transparent 50%, rgba(69, 142, 209, 0.04) 50%);
