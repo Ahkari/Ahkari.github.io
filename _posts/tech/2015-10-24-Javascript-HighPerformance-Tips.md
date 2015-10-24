@@ -14,15 +14,15 @@ description: 高性能javascript读书笔记，将不知道的知识点记下来
 2. `<script>`的defer标签已被现代浏览器支持。并行下载，并在页面加载完，load前触发
   * 如下代码，三个标签位置随便互换，最后执行结果都是一样的
 
-	<head>
-		<title>含有Defer属性的js标签执行</title>
-		<meta charset="UTF-8"></meta>
-	</head>
-	<body>
-	<script defer src="./defer.js"></script> //console.log('defer<script>执行')
-	<script src="./script.js"></script> //console.log('普通<script>执行')
-	<script src="./load.js"></script> //window.onload = function(){ console.log('页面onload事件触发') ; }
-	</body>
+    <head>
+        <title>含有Defer属性的js标签执行</title>
+        <meta charset="UTF-8"></meta>
+    </head>
+    <body>
+    <script defer src="./defer.js"></script> //console.log('defer<script>执行')
+    <script src="./script.js"></script> //console.log('普通<script>执行')
+    <script src="./load.js"></script> //window.onload = function(){ console.log('页面onload事件触发') ; }
+    </body>
 
     普通<script>执行
     defer<script>执行
