@@ -16,7 +16,7 @@ description: 高性能javascript读书笔记，将不知道的知识点记下来
 
 	<head>
 		<title>含有Defer属性的js标签执行</title>
-		<meta charset="UTF-8"></meta>`
+		<meta charset="UTF-8"></meta>
 	</head>
 	<body>
 	<script defer src="./defer.js"></script> //console.log('defer<script>执行')
