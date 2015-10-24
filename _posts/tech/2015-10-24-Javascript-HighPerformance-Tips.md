@@ -21,9 +21,9 @@ description: 高性能javascript读书笔记，将不知道的知识点记下来
 		<meta charset="UTF-8"></meta>`
 	</head>
 	<body>
-	<script defer src="./defer.js"></script> //`console.log('defer<script>执行')`
-	<script src="./script.js"></script> //`console.log('普通<script>执行')`
-	<script src="./load.js"></script> //`window.onload = function(){ console.log('页面onload事件触发') ; }`
+	<script defer src="./defer.js"></script> //console.log('defer<script>执行')
+	<script src="./script.js"></script> //console.log('普通<script>执行')
+	<script src="./load.js"></script> //window.onload = function(){ console.log('页面onload事件触发') ; }
 	</body>
     </html>
 

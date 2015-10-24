@@ -34,6 +34,7 @@ html, body {
   height: 100%;
   margin: 0;
   font: 100 16px/1.5 Avenir, sans-serif;
+  font-style: 'Microsoft Yahei' ;
   -webkit-font-smoothing: subpixel-antialiased;
   -webkit-text-size-adjust: none;
   overflow: hidden; }
