@@ -65,10 +65,10 @@ description: 高性能javascript读书笔记，将不知道的知识点记下来
     `docuemnt.forms[0].elements`
 以上这些dom访问操作的结果都会实时反应文档中元素的状态，没有意识到集合的实时性的话会导致一些不易察觉的逻辑错误。
 
-    var divs = document.getElementsByTagName('div') ;
-    for ( var i = 0 ; i < divs.length ; i++){ //每次访问divs,其length反应了实时状态
-        document.body.appendChild( document.createElement('div') ) ;	//一个意外的死循环, 这里将永远执行下去
-    }
+>	var divs = document.getElementsByTagName('div') ;
+>	for ( var i = 0 ; i < divs.length ; i++){ //每次访问divs,其length反应了实时状态
+>	    document.body.appendChild( document.createElement('div') ) ;	//一个意外的死循环, 这里将永远执行下去
+>	}
 
 需要注意的是，html集合是个类数组而并不是数组，虽然可以通过下标访问其中的元素，但是一些基本的Array类应该有的原型方法却并不能使用。
 例如用`indexOf`判断某个元素是否存在于某个html集合中，有两种方法，
@@ -91,16 +91,16 @@ description: 高性能javascript读书笔记，将不知道的知识点记下来
 3. 选用现代浏览器优化过的元素节点API。
 现代浏览器API遍历时只返回元素节点，而**旧的API会算上普通文本甚至是注释与空白**，因此运行缓慢
 
-	>		+---------------------------------+-------------------------+---------------------------------------------------+-------------------+
-	>		|            功能                 |      现代属性名API      |                现代API兼容性                      |  被替代的属性API  |
-	>		+---------------------------------+-------------------------+---------------------------------------------------+-------------------+
-	>		|   获取当前节点的所有子节点      |         children        |   Firefox3.5+/Safari 4+/Chrome/Opera9.62+/IE 6+   |    childNodes     |
-	>		|   获取当前节点的子节点个数      |   childElementCount     |   Firefox3.5+/Safari 4+/Chrome/Opera9.62+/IE 9+   | ChildNodes.length |
-	>		|  获取当前节点里第一个子节点     |   firstElementChild     |   Firefox3.5+/Safari 4+/Chrome/Opera9.62+/IE 9+   |    firstChild     |
-	>		|  获取当前节点里最后一个子节点   |    lastElementChild     |   Firefox3.5+/Safari 4+/Chrome/Opera9.62+/IE 9+   |    lastChild      |
-	>		|    获取当前节点后一个节点       |   nextElementSibling    |   Firefox3.5+/Safari 4+/Chrome/Opera9.62+/IE 9+   |   nextSibling     |
-	>		|    获取当前节点前一个节点       |  previousElementSibling |   Firefox3.5+/Safari 4+/Chrome/Opera9.62+/IE 9+   |  previousSibling  |
-	>		+---------------------------------+-------------------------+---------------------------------------------------+-------------------+
+>		+---------------------------------+-------------------------+---------------------------------------------------+-------------------+
+>		|            功能                 |      现代属性名API      |                现代API兼容性                      |  被替代的属性API  |
+>		+---------------------------------+-------------------------+---------------------------------------------------+-------------------+
+>		|   获取当前节点的所有子节点      |         children        |   Firefox3.5+/Safari 4+/Chrome/Opera9.62+/IE 6+   |    childNodes     |
+>		|   获取当前节点的子节点个数      |   childElementCount     |   Firefox3.5+/Safari 4+/Chrome/Opera9.62+/IE 9+   | ChildNodes.length |
+>		|  获取当前节点里第一个子节点     |   firstElementChild     |   Firefox3.5+/Safari 4+/Chrome/Opera9.62+/IE 9+   |    firstChild     |
+>		|  获取当前节点里最后一个子节点   |    lastElementChild     |   Firefox3.5+/Safari 4+/Chrome/Opera9.62+/IE 9+   |    lastChild      |
+>		|    获取当前节点后一个节点       |   nextElementSibling    |   Firefox3.5+/Safari 4+/Chrome/Opera9.62+/IE 9+   |   nextSibling     |
+>		|    获取当前节点前一个节点       |  previousElementSibling |   Firefox3.5+/Safari 4+/Chrome/Opera9.62+/IE 9+   |  previousSibling  |
+>		+---------------------------------+-------------------------+---------------------------------------------------+-------------------+
 
 
 4. 使用现代浏览器的**选择器API**，基于css选择器语法，适合选择大量且条件相对复杂的元素。
