@@ -45,14 +45,14 @@ description: 高性能javascript读书笔记，将不知道的知识点记下来
 
 1. 区分浏览器的渲染引擎和js引擎，dom和javascript是独立实现的，他们之间**通信的消耗是dom操作消耗性能的根本原因**。
 
-	+-----------+--------------------+--------------------------------------------+
-	| 浏览器    |      渲染引擎      |                 js引擎                     |
-	+-----------+--------------------+--------------------------------------------+
-	| Safari    |  WebKit / WebCore  |        JavascriptCore / SquirrelFish       |
-	| Chrome    |  WebKit / WebCore  |                    V8                      |
-	| Firefox   |        Gecko       |  SpiderMonkey / TraceMonkey / JagerMonkey  |
-	| IE        |       Trident      |   				JScript                   |
-	+-----------+--------------------+--------------------------------------------+
+    >		+-----------+--------------------+--------------------------------------------+
+    >		| 浏览器    |      渲染引擎      |                 js引擎                     |
+    >		+-----------+--------------------+--------------------------------------------+
+    >		| Safari    |  WebKit / WebCore  |        JavascriptCore / SquirrelFish       |
+    >		| Chrome    |  WebKit / WebCore  |                    V8                      |
+    >		| Firefox   |        Gecko       |  SpiderMonkey / TraceMonkey / JagerMonkey  |
+    >		| IE        |       Trident      |   				JScript                   |
+    >		+-----------+--------------------+--------------------------------------------+
 
 
 2. HTML集合具有实时性，时刻链接着底层文档。每次使用结果对象的时候，哪怕只是访问length都会**重复最初的查询的过程**。
@@ -91,16 +91,16 @@ description: 高性能javascript读书笔记，将不知道的知识点记下来
 3. 选用现代浏览器优化过的元素节点API。
 现代浏览器API遍历时只返回元素节点，而**旧的API会算上普通文本甚至是注释与空白**，因此运行缓慢
 
-	+---------------------------------+-------------------------+---------------------------------------------------+-------------------+
-	|            功能                 |      现代属性名API      |                现代API兼容性                      |  被替代的属性API  |
-	+---------------------------------+-------------------------+---------------------------------------------------+-------------------+
-	|   获取当前节点的所有子节点      |         children        | Firefox3.5+/Safari 4+/Chrome/Opera9.62+/**IE 6+** |    childNodes     |
-	|   获取当前节点的子节点个数      |   childElementCount     | Firefox3.5+/Safari 4+/Chrome/Opera9.62+/**IE 9+** | ChildNodes.length |
-	|  获取当前节点里第一个子节点     |   firstElementChild     | Firefox3.5+/Safari 4+/Chrome/Opera9.62+/**IE 9+** |    firstChild     |
-	|  获取当前节点里最后一个子节点   |    lastElementChild     | Firefox3.5+/Safari 4+/Chrome/Opera9.62+/**IE 9+** |    lastChild      |
-	|    获取当前节点后一个节点       |   nextElementSibling    | Firefox3.5+/Safari 4+/Chrome/Opera9.62+/**IE 9+** |   nextSibling     |
-	|    获取当前节点前一个节点       |  previousElementSibling | Firefox3.5+/Safari 4+/Chrome/Opera9.62+/**IE 9+** |  previousSibling  |
-	+---------------------------------+-------------------------+---------------------------------------------------+-------------------+
+	>		+---------------------------------+-------------------------+---------------------------------------------------+-------------------+
+	>		|            功能                 |      现代属性名API      |                现代API兼容性                      |  被替代的属性API  |
+	>		+---------------------------------+-------------------------+---------------------------------------------------+-------------------+
+	>		|   获取当前节点的所有子节点      |         children        |   Firefox3.5+/Safari 4+/Chrome/Opera9.62+/IE 6+   |    childNodes     |
+	>		|   获取当前节点的子节点个数      |   childElementCount     |   Firefox3.5+/Safari 4+/Chrome/Opera9.62+/IE 9+   | ChildNodes.length |
+	>		|  获取当前节点里第一个子节点     |   firstElementChild     |   Firefox3.5+/Safari 4+/Chrome/Opera9.62+/IE 9+   |    firstChild     |
+	>		|  获取当前节点里最后一个子节点   |    lastElementChild     |   Firefox3.5+/Safari 4+/Chrome/Opera9.62+/IE 9+   |    lastChild      |
+	>		|    获取当前节点后一个节点       |   nextElementSibling    |   Firefox3.5+/Safari 4+/Chrome/Opera9.62+/IE 9+   |   nextSibling     |
+	>		|    获取当前节点前一个节点       |  previousElementSibling |   Firefox3.5+/Safari 4+/Chrome/Opera9.62+/IE 9+   |  previousSibling  |
+	>		+---------------------------------+-------------------------+---------------------------------------------------+-------------------+
 
 
 4. 使用现代浏览器的**选择器API**，基于css选择器语法，适合选择大量且条件相对复杂的元素。
