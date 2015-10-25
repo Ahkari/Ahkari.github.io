@@ -956,7 +956,7 @@ pre {
       background: #d6dbe1; }
 
 pre > code {
-  font-family: inherit;
+  font-family: 'consolas';
   direction: ltr;
   text-align: left;
   white-space: pre;
