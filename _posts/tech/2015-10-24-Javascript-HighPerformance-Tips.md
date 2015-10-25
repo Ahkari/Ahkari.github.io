@@ -60,29 +60,29 @@ description: 高性能javascript读书笔记，将不知道的知识点记下来
     `document.forms`
     `docuemnt.forms[0].elements`
 以上这些dom访问操作的结果都会实时反应文档中元素的状态，没有意识到集合的实时性的话会导致一些不易察觉的逻辑错误。
-```javascript
-//一个意外的死循环
-var divs = document.getElementsByTagName('div') ;
-for ( var i = 0 ; i < divs.length ; i++){ //每次访问divs,其length反应了实时状态
-    document.body.appendChild( document.createElement('div') ) ;
-}
-```
+
+    //一个意外的死循环
+    var divs = document.getElementsByTagName('div') ;
+    for ( var i = 0 ; i < divs.length ; i++){ //每次访问divs,其length反应了实时状态
+        document.body.appendChild( document.createElement('div') ) ;
+    }
+
 需要注意的是，html集合是个类数组而并不是数组，虽然可以通过下标访问其中的元素，但是一些基本的Array类应该有的原型方法却并不能使用。
 例如用`indexOf`判断某个元素是否存在于某个html集合中，有两种方法，
 一种是借用Aarry原型：
 `Array.prototype.indexOf.call( htmlCollection , htmlNode ) ;`
 一种是将html集合转为普通数组：
-```javascript
-function toArray(htmlCollection){
-    for (var ret=[],i=0;i<htmlCollection.length;i++){
-        ret[i] = htmlCollection[i] ;
+
+    function toArray(htmlCollection){
+        for (var ret=[],i=0;i<htmlCollection.length;i++){
+            ret[i] = htmlCollection[i] ;
+        }
+        return ret ;
     }
-    return ret ;
-}
-toArray( document.getElementsByClassName('test') ).indexOf( document.getElementsByClassName('test')[0] ) ; // 0 
-toArray( document.getElementsByClassName('test') ).indexOf( document.getElementsByClassName('test')[1] ) ; // 1
-toArray( document.getElementsByClassName('test') ).indexOf( document.getElementsByClassName('test')[2] ) ; // 2 
-```
+    toArray( document.getElementsByClassName('test') ).indexOf( document.getElementsByClassName('test')[0] ) ; // 0 
+    toArray( document.getElementsByClassName('test') ).indexOf( document.getElementsByClassName('test')[1] ) ; // 1
+    toArray( document.getElementsByClassName('test') ).indexOf( document.getElementsByClassName('test')[2] ) ; // 2 
+
 
 基于html集合实时性，我们可以用多种方法提升访问时的性能，例如需要重复读取属性时，将不变的属性用局部变量存储；同理，转换为数组时对其操作和读取的效率也会明显提高。
 3. 选用现代浏览器优化过的元素节点API。
@@ -106,31 +106,31 @@ toArray( document.getElementsByClassName('test') ).indexOf( document.getElements
     * 浏览器会将一系列会触发重排的操作列队，之后一并执行以优化性能。但是如果在队列中途使用[[get]]操作访问元素布局属性，如`offsetTop`,`offsetLeft`,`offsetWidth`,`offsetHeight`,`scrollTop`|||,`clientTop`,|||,`getComputedStyle() (currentStyle in IE)`就会为了数据的准确性而强制执行当前队列，强制触发重排而打乱浏览器的重排优化。
 所以合理控制元素属性的读与写能基于重排优化大大提高执行性能。下面介绍些重排优化方法，有些甚至很奇怪。
         1 合并样式修改，这个比较好理解
-        ```javascript
-        //初始代码
-        var el = document.getElementById('mydiv') ;
-        el.style.borderLeft = '1px' ;
-        el.style.borderRight = '2px' ;
-        el.style.padding = '5px' ;
-        //优化为
-        var el = document.getElementById('mydiv') ;
-        el.style.cssText = 'border-left:1px;border-right:2px;padding:5px;' ;
-        //或使用下述的css类名控制
-        var el = document.getElementById('mydiv') ;
-        el.className = 'active' ;
-        ```
+    
+            //初始代码
+            var el = document.getElementById('mydiv') ;
+            el.style.borderLeft = '1px' ;
+            el.style.borderRight = '2px' ;
+            el.style.padding = '5px' ;
+            //优化为
+            var el = document.getElementById('mydiv') ;
+            el.style.cssText = 'border-left:1px;border-right:2px;padding:5px;' ;
+            //或使用下述的css类名控制
+            var el = document.getElementById('mydiv') ;
+            el.className = 'active' ;
+      
         
         2 强制脱离文档流，这个脱离的概念有点有趣，就是将元素diaplay:none;掉，执行完dom变化的操作后再disolay:block;回来。
         3 创建文档之外的文档片段，在其中操作dom。这个轻量级的document对象同样很有趣，我是第一次见这个API。**【这个是所被推荐的方法，因为只触发一次重排】**
-        ```javascript
-        var fragment = document.createDocumentFragment() ;
-        //这里对fragment进行dom操作,fragment本身在文档之外
-        document.getElementById('myList').appendChild( fragment ) ; //操作完之后将片段放回文档之中
-        ```
+      
+            var fragment = document.createDocumentFragment() ;
+            //这里对fragment进行dom操作,fragment本身在文档之外
+            document.getElementById('myList').appendChild( fragment ) ; //操作完之后将片段放回文档之中
+        
         4 克隆节点，操作完成后替换旧节点。**经验证，此法并不能克隆原元素所绑定的事件，极不推荐【在IE旧浏览器上有能克隆事件的bug】。**
-        ```javascript
-        var old = document.getElementById('myList') ;
-        var clone = old.cloneNode(true) ; //true,内部子元素也克隆
-        //这里对clone进行操作
-        old.parentNode.replaceChild(clone,old) ;
-        ```
+
+            var old = document.getElementById('myList') ;
+            var clone = old.cloneNode(true) ; //true,内部子元素也克隆
+            //这里对clone进行操作
+            old.parentNode.replaceChild(clone,old) ;
+     
