@@ -212,11 +212,11 @@ widget使用方法有如下几个场景,我们以新建一个自定义控件为�
 再定义一个继承自父控件的子类控件
 我们查看`$.Widget._childConstructors`属性，这是记载Widget根控件其所有实例的数组，我们查看最后一个实例的内容：
 
-![父类控件](http://d.picphotos.baidu.com/album/s%3D1600%3Bq%3D90/sign=22b18c18b0fd5266a32b38129b28ac5a/b7003af33a87e9509650739f16385343faf2b4fa.jpg)
+![父类控件](http://7xny7k.com1.z0.glb.clouddn.com/superWidget.png)
 
 可见这是我们刚刚定义的`superWidget`，显示他又有一个子类实例，点开：
 
-![子类控件](http://c.picphotos.baidu.com/album/s%3D1600%3Bq%3D90/sign=519b05df8101a18bf4eb1649ae1f3c79/8d5494eef01f3a29f7ba563d9f25bc315d607cd7.jpg)
+![子类控件](http://7xny7k.com1.z0.glb.clouddn.com/subClass.png)
 
 可见这是我们刚定义的`subWidget`。
 
