@@ -21,7 +21,7 @@ description: 源码解析jqueryUI的核心方法widget，理解源码可以帮�
 ### 从widget使用方法探究其实现
 
 widget使用方法有如下几个场景,我们以新建一个自定义控件为例
-1 定义控件
+1 **定义控件**
         
     $.widget('ui.test','ui.superTest',{
         options:{},
@@ -34,7 +34,7 @@ widget使用方法有如下几个场景,我们以新建一个自定义控件为�
 一定是有一个`$.widget()`工厂方法，根据参数不同构建出不同的控件对象。
 这个工厂方法本身还可能有原型方法，因为我们所知构建出的控件具有很多内置方法。
 
-2 给控件传参
+2 **给控件传参**
     
     `$( selectorString ).test( options ) ;`
 
@@ -43,7 +43,7 @@ widget使用方法有如下几个场景,我们以新建一个自定义控件为�
 猜想其实现：
 步骤1里工厂方法里所构建出的`widget`对象需要插件化，便于被`jquery`元素插件式调用。我们猜想这里和`$.fn`一定有着千丝万缕的联系。
 
-3 使用控件方法
+3 **使用控件方法**
 
     `$( selectorString ).test( funcName , arguments ) ;`
 
@@ -184,12 +184,12 @@ widget使用方法有如下几个场景,我们以新建一个自定义控件为�
         return constructor;
     };
 
-注一：这里添加了一个插件名命名的伪类选择器。
+注一：**这里添加了一个插件名命名的伪类选择器。**
 现在选择器字符里只要追加上`:fullName`（例如：`$(':ui-test')`）就会选中页面中所有定义`ui.test`控件的元素。
 其代码实现是通过jquery内部的`$.expr`方法实现，我们从`return !!$.data( elem, fullName )`推断其实现方式：
 检测`elem`中`data`是否有`fullName`对象（我们已经知道`widget`对象就命名为`fullName`，并用`jquery`的`data`方法存在绑定的元素上），并返回结果为true的元素集合。
-注二：类实例化的核心流程。见下方B处代码的注一。
-注三：深复制`options`的必要性。
+注二：**类实例化的核心流程。见下方B处代码的注一。**
+注三：**深复制`options`的必要性。**
 `basePrototype.options = $.widget.extend( {}, basePrototype.options )`
 为了让父类配置的改动不会影响子类。
 
@@ -203,7 +203,7 @@ widget使用方法有如下几个场景,我们以新建一个自定义控件为�
     super.foo = 3 ；
     //此时 constructor.proto 仍然为foo:2
 
-注四：我们通过统计页面`widget`实例数量来看控件类继承。
+注四：**我们通过统计页面`widget`实例数量来看控件类继承。**
 这里我们知道所有实例化过的控件不仅挂载在$上了，并且一层层套在父类的实例属性里。
 比如如下操作：
 `$.widget('ui.superWidget',{options:{name:'我是一个父类,没有指定继承,所以父类是$.Widget'}}) ;`
@@ -281,7 +281,7 @@ widget使用方法有如下几个场景,我们以新建一个自定义控件为�
         };
     };
 
-注一：由A处注二部分的定义的构造函数将在这里被实例化。
+注一：**由A处注二部分的定义的构造函数将在这里被实例化。**
 我们看A处注二的代码：
 
     constructor = $[ namespace ][ name ] = function( options, element ) {
@@ -541,18 +541,18 @@ widget使用方法有如下几个场景,我们以新建一个自定义控件为�
     };
 
 
-注一：`_create`入口方法。
+注一：**`_create`入口方法。**
 我们在最开始举例用来定义控件时除了配置`options`还写了一个`_create`方法，这个方法就是控件初始化方法。
 初始化过程：
 jquery元素第一次调用控件（必须是配置方式）——实例化指定控件——执行内置`_createWidget`——执行`_create`——存储该控件对象于jquery元素之上。
 
-注二：内置的option方法根据调用方式有多种配置数值的的方式。
+注二：**内置的option方法根据调用方式有多种配置数值的的方式。**
 1. `option()`：无参：执行`[[getter]]`，返回当前的`options`
 2. `option(keyString)`：单参且参数为`string`型：**查询**`options`中`key`属性的值，如果key是`obj.obj2.obj3.attr`式字符串，则按照对象属性查询来返回`options`深层属性的值。
 3. `option(keyString,value)`：双参：同单参。**设定**`key`字符串所指向的属性的值。
 4. `option(keyObject)`：参数第一个是object就行。数量无所谓：将这个object深合并进当前的`options`中。
 
-注三：提供样式控制与方法增强。
+注三：**提供样式控制与方法增强。**
 某些控件，比如最原生的`button`，都是有实实在在的`disabled`属性的。我们用`jqueryUI`的`button`方法时通过设定`options`或是直接使用`disable()`,`enable()`方法自然可以将其状态改变。
 但是大部分自定义控件并没有什么`disabled`状态，我们只能通过简单的`css`类控制来表示我们做过了“disable”或“enable”操作。
 我们翻开`jqueryUI`的`button`控件的源码。其`_setOption`方法中关于设定`disabled`参数的部分是如此实现的：
@@ -572,7 +572,7 @@ jquery元素第一次调用控件（必须是配置方式）——实例化指�
 其他未修改基础方法的控件涉及“disabled”属性的操作，都是简单的执行css样式控制而已。
 
 
-###小结###
+### 小结
 
 看完源码后我们再次想下widget特性和使用方法，是否已经解决了我们所有的疑问。
 1. **状态维持**：本质是因为`options`和方法实例化之后都储存在了jq对象的data里面，所以能一直维持在页面之中，只有触发其`destory()`方法才能确实移除（dom元素`remove`时会调用`destory()`）。
