@@ -58,24 +58,24 @@ player帽子松鼠的状态是游戏最重要的部分。
 而物理速度并不是状态值，因为实际中会有撞墙等意外因素，不能说撞了墙水平速度为0了咱们就得显示个撞墙状态对不对，
 撞墙时我们应当继续显示小松鼠在正常的朝着墙努力地走。
 
-    //状态机, 根据输入改变状态
-    game.vars_.stateMachine = function stateMachine( setObj , speed , nextState , timeDelay ){
-        var self = setObj ;
-        console.log('状态改变为') ;
-        console.log( nextState ) ;
-        self.setSpeed( speed.x , speed.y ) ;
-        self.setVar( 'boxing' , nextState['boxing'] ) ;
-        self.setVar( 'state' , nextState['state'] ) ;
-        self.setVar( 'direction' , nextState['direction'] ) ;
-        game.vars_.changeDisplay( setObj , nextState , timeDelay ) ;
-    }
+        //状态机, 根据输入改变状态
+        game.vars_.stateMachine = function stateMachine( setObj , speed , nextState , timeDelay ){
+            var self = setObj ;
+            console.log('状态改变为') ;
+            console.log( nextState ) ;
+            self.setSpeed( speed.x , speed.y ) ;
+            self.setVar( 'boxing' , nextState['boxing'] ) ;
+            self.setVar( 'state' , nextState['state'] ) ;
+            self.setVar( 'direction' , nextState['direction'] ) ;
+            game.vars_.changeDisplay( setObj , nextState , timeDelay ) ;
+        }
 
-我们看下我们给松鼠指定的三个状态值。这三个属性值三三随机组合能囊括松鼠所有的状态。
-状态属性一： boxing 即是否搬着箱子。0 没有； 1 有。
-状态属性二： state 即单体动作。stand站着；walk行走；jump跳跃；lying下蹲；jumpNoSpeed原地跳跃（这个展示的图片和jump一样，但确实是一个需要独立出来的状态，类比stand之于walk）；
-状态属性三： direction 即朝向。0 朝左； 1 朝右。
-假设我们搬着箱子在向左跳跃的过程中按了下D键，
-我们获取当前状态，不出所料是这样：
+    我们看下我们给松鼠指定的三个状态值。这三个属性值三三随机组合能囊括松鼠所有的状态。
+    状态属性一： boxing 即是否搬着箱子。0 没有； 1 有。
+    状态属性二： state 即单体动作。stand站着；walk行走；jump跳跃；lying下蹲；jumpNoSpeed原地跳跃（这个展示的图片和jump一样，但确实是一个需要独立出来的状态，类比stand之于walk）；
+    状态属性三： direction 即朝向。0 朝左； 1 朝右。
+    假设我们搬着箱子在向左跳跃的过程中按了下D键，
+    我们获取当前状态，不出所料是这样：
 
     {
         boxing : 1 ,
@@ -83,7 +83,7 @@ player帽子松鼠的状态是游戏最重要的部分。
         direction : 0 
     }
 
-我们根据当前按键状态，以及其他因素，判断之后应该变成这样的状态：
+    我们根据当前按键状态，以及其他因素，判断之后应该变成这样的状态：
     
     {
         boxing : 1 ,
@@ -91,15 +91,15 @@ player帽子松鼠的状态是游戏最重要的部分。
         direction : 1
     }
 
-并且应当给个这样的速度
+    并且应当给个这样的速度
     
     {
         x : 140 , //向右140px/s
         y : 0 + self.speed.y  //y方向速度保持不变
     }
 
-最后交付给状态机，状态机帮我们设了速度，改了状态，交付给`game.vars_.changeDisplay()`公共方法来改变显示的图形。
-我们根据更改后的状态傻瓜式if语句查询，最后找到要更改的图形`boxJumpRight_default`：
+    最后交付给状态机，状态机帮我们设了速度，改了状态，交付给`game.vars_.changeDisplay()`公共方法来改变显示的图形。
+    我们根据更改后的状态傻瓜式if语句查询，最后找到要更改的图形`boxJumpRight_default`：
 
     ...
     }else if( nextState['boxing'] === 1 ){
@@ -111,9 +111,9 @@ player帽子松鼠的状态是游戏最重要的部分。
             }
         ...
 
-我的上帝我发誓我找不出比这更蠢的代码了，而且我还想不到特别有效的优化办法。
-最后我们看下图片，就知道我们松鼠有多少对应状态了233。
-![松鼠状态](http://7xny7k.com1.z0.glb.clouddn.com/s7.png)
+    我的上帝我发誓我找不出比这更蠢的代码了，而且我还想不到特别有效的优化办法。
+    最后我们看下图片，就知道我们松鼠有多少对应状态了233。
+    ![松鼠状态](http://7xny7k.com1.z0.glb.clouddn.com/s7.png)
 
 3. 盒子状态管理
 管理完松鼠之后，盒子实在是太简单了。
