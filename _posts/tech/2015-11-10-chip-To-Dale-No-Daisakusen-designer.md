@@ -75,39 +75,39 @@ player帽子松鼠的状态是游戏最重要的部分。
     假设我们搬着箱子在向左跳跃的过程中按了下D键，
     我们获取当前状态，不出所料是这样：
 
-    {
-        boxing : 1 ,
-        state : 'jump' , 
-        direction : 0 
-    }
+        {
+            boxing : 1 ,
+            state : 'jump' , 
+            direction : 0 
+        }
 
     我们根据当前按键状态，以及其他因素，判断之后应该变成这样的状态：
     
-    {
-        boxing : 1 ,
-        state : 'jump' ,
-        direction : 1
-    }
+        {
+            boxing : 1 ,
+            state : 'jump' ,
+            direction : 1
+        }
 
     并且应当给个这样的速度
     
-    {
-        x : 140 , //向右140px/s
-        y : 0 + self.speed.y  //y方向速度保持不变
-    }
+        {
+            x : 140 , //向右140px/s
+            y : 0 + self.speed.y  //y方向速度保持不变
+        }
 
     最后交付给状态机，状态机帮我们设了速度，改了状态，交付给`game.vars_.changeDisplay()`公共方法来改变显示的图形。
     我们根据更改后的状态傻瓜式if语句查询，最后找到要更改的图形`boxJumpRight_default`：
 
-    ...
-    }else if( nextState['boxing'] === 1 ){
-        switch ( nextState['state'] ){
         ...
-        case 'jump':
-            if ( nextState['direction'] === 1 ){
-                self.changeSprite('boxJumpRight_default');
-            }
-        ...
+        }else if( nextState['boxing'] === 1 ){
+            switch ( nextState['state'] ){
+            ...
+            case 'jump':
+                if ( nextState['direction'] === 1 ){
+                    self.changeSprite('boxJumpRight_default');
+                }
+            ...
 
     我的上帝我发誓我找不出比这更蠢的代码了，而且我还想不到特别有效的优化办法。
     最后我们看下图片，就知道我们松鼠有多少对应状态了233。
