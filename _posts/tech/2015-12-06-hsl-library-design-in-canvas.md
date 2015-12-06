@@ -6,6 +6,15 @@ tags: canvas hsl smartHSL
 description: 如何从hsl基础理论开始撸一个hsl处理库
 ---
 
+### 地址
+
+先把地址放了吧, 大家有兴趣可以先去看看。
+
+[smartHSL-源码-github](https://github.com/Ahkari/smartHSL)
+
+[smartHSL-极速操作hsl-demo](http://ahkari.github.io/smartHSL/)
+
+
 ### 何来的需求?
 
 最近(其实就是下周啦)项目里要加一个控件。 
