@@ -209,15 +209,7 @@ html5的canvas元素将web表现能力整体提升了一个档次，能帮助开
         lOpe = (parseInt(options[2])+100)/200 ; //[-100,100]区间转为[0,1]区间
         //色相比值计算
         function hAdapt(old,ope){ 
-            var newH ;
-            if ( ope === 180 ){
-                newH = old ;
-            }else if ( ope < 180 ){
-                newH = old*ope/180 ;
-            }else if ( ope > 180 ){
-                newH = 2*old + 2*ope - (ope*old/180) - 360 ;
-            }
-            return newH ;
+            return old+ope-180 ;
         } 
         //饱和度比值计算
         function sAdapt(old,ope){
