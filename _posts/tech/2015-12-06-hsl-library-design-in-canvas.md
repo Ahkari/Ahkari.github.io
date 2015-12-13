@@ -97,7 +97,7 @@ html5的canvas元素将web表现能力整体提升了一个档次，能帮助开
         
         H : function(){
             var h = parseInt( arguments[0] ) ;
-            if ( h === NaN ){
+            if ( isNaN(h) ){
                 return ;
             }
             this.Hue = h ;
