@@ -7,9 +7,7 @@ description: pixi源码解析第二章
 ---
 
 之前我们做做热身看了看工具类，现在正式进入游戏引擎核心。
-
 DisplayObject类需要一个我们之前没有看的类, RenderTexture类。
-
 他在DiaplayObject类上是这么引入的，
 
 `RenderTexture = require('../textures/RenderTexture'),`
