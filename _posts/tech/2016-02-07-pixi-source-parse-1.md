@@ -21,11 +21,11 @@ pixi在commonJS模范下会首先按顺序加载图示模块，
 
 ### 概念补习
 PIXI源码中有一些方法，了解他们有助于源码阅读。
+
 1. require()
 require会在当前js文件目录开始索引获取目标js的export值，如果目标是文件夹则默认取其中index.js的exports
 2. Object.assign(tar,orgin)
-将orgin的**可枚举**属性拷贝到tar对象上，返回tar对象。 
-3.  
+将orgin的**可枚举**属性拷贝到tar对象上，返回tar对象。 PIXI有这部分的功能增强。 
 
 ### require('./polyfill')
 1. Object.assign.js 用来fix这个方法
@@ -211,7 +211,9 @@ require会在当前js文件目录开始索引获取目标js的export值，如果
         
 2. PIXI.Matrix
 表示二位矩阵的类，含有六个属性[a,b,c,d,e,f]。可以实现css3那样的所有变形效果。补充知识如下:
+
 ![二维矩阵运算](http://7xny7k.com1.z0.glb.clouddn.com/pixi1.jpg)
+
 浏览器既然也是通过矩阵运算的方式把css3效果转换为matrix来执行，pixi自然也是一样。
 我们根据上图总结出如下规律:
 1, 4 是缩放变形的结果　　scale(sx,sy)可以由matrix(sx,0,0,sy,0,0)转变

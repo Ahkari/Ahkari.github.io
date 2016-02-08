@@ -6,18 +6,25 @@ tags: pixiJS 源码解析
 description: pixi源码解析第二章
 ---
 
-之前我们做做热身看了看工具类，现在正式进入游戏引擎核心类。
+之前我们做做热身看了看工具类，现在正式进入游戏引擎核心。
 
 DisplayObject类需要一个我们之前没有看的类, RenderTexture类。
+
 他在DiaplayObject类上是这么引入的，
+
 `RenderTexture = require('../textures/RenderTexture'),`
+
 这个类用来辅助创建渲染材质。在我们要渲染复杂内容的时候会用到。
+
 下面先我们插播材质类的解析，按照他的引用一步步分析。
 
 ### BaseTexture = require('./BaseTexture'),
 渲染材质类依赖的第一个类是基础材质类BaseTexture。
+
 构造时接受三个参数, 分别是材质源, 拉伸模式, 分辨率。
+
 构造时如果材质参数存在则开始构造材质。
+
 他自身需要关注的属性如下几个：
     
 * resolution分辨率, 默认为1
@@ -28,8 +35,12 @@ DisplayObject类需要一个我们之前没有看的类, RenderTexture类。
 * isLoading是否正在载入中
 * premultipliedAlpha是否需要乘以透明度参数, 只webGL有效
 
-需要注意到，在该js的16行：`EventEmitter.call(this);`,
+需要注意到，
+
+在该js的16行：`EventEmitter.call(this);`,
+
 163行， `BaseTexture.prototype = Object.create(EventEmitter.prototype);`
+
 该类的继承自事件类。从基础材质类开始, PIXI终于开始引入了事件机制, 往后的源码中将有很多的hock函数。
 
 那么我们中途稍微学习下这个EventEmitter的源码，我们可以通过查看pixi.js浏览器版本来看node里定义的这个模块代码都有啥：
@@ -121,6 +132,7 @@ DisplayObject类需要一个我们之前没有看的类, RenderTexture类。
     };
     
 源于node的这个事件模块的代码我们看完了，就可以理解pixi里面的这些事件机制了。
+
 基本套路就是on或once对指定事件注册回调方法，通过emit来触发。
 
     BaseTexture.prototype.update = function ()
@@ -158,17 +170,25 @@ DisplayObject类需要一个我们之前没有看的类, RenderTexture类。
     };
 
 从这个销毁方法我们可以看到: 
+
 一个健壮的类库对于其中的每个对象都是精心管理着的, 一个材质对象新建时我们会把他的信息用标识缓存起来, 统一管理还能确保不重复创建。 
+
 同理, 销毁材质时需要把相关的内容都删除干净，去除引用。最后还可能有销毁完毕后的处置方法，让某些用到这个材质的对象都会做出相应的响应操作。
 
+
 我们在阅读这部分源码的时候会心生一个疑惑，就是基础材质的第一个参数source究竟是一个什么样的对象呢？
+
 在基础材质里对于这个对象我们操作了很多次，和他的src属性打交道，同时还有getContext方法。这个source究竟是image还是canvas对象啊？
 
 这时候我们可以翻看官方API文档或看源码方法注释
+
 ` @param source {Image|Canvas} the source object of the texture.`
+
 可见这个source可以是image对象或canvas对象, PIXI会根据对象检测自动处理的。之前源码中许多特性不够明确让人疑惑的部分很多都是分情况处理image或canvas导致的。
 
+
 基础材质源码的最后，有两个方法完美解决了刚才的疑惑，下面就是PIXI对于image和canvas的分别处理的入口方法。
+
 这两个方法没有挂载在原型链上。可以直接作为方法调用，并返回一个`new BaseTexture()`对象。简简单单就实现了基础材质的无new式创建！
 
     BaseTexture.fromImage = function (imageUrl, crossorigin, scaleMode)
@@ -209,11 +229,15 @@ DisplayObject类需要一个我们之前没有看的类, RenderTexture类。
     };
 
 下一个材质是普通材质Texture类, 然而他又依赖一个VideoBaseTexture类,
+
 我们先看这个类:
 
 ### VideoBaseTexture = require('./VideoBaseTexture'),
+
 "音乐材质"类, PIXI中音乐作为资源的一种来对待。
+
 核心方法`PIXI.VideoBaseTexture.fromUrl()`有四种加载url资源的方式。
+
 有了基础材质我们看的一头雾水的经验，这次我们从入口方法开始看：
 
     VideoBaseTexture.fromUrl = function (videoSrc, scaleMode)
@@ -265,16 +289,26 @@ DisplayObject类需要一个我们之前没有看的类, RenderTexture类。
     };
 
 fromVideo将dom资源顺利的引入到PIXI的VideoBaseTexture类里，并携带了video标签对象。这个类便不再难以理解了。
+
 VideoBaseTexture类继承自BaseTexture类。所以onload这些过程便不需要再写了。
+
 只需要对音频资源做一些额外的处理。
+
 多出了一些原型方法，他们会在video触发相应的事件时触发，并修改音频材质对象的状态。
+
 `source.addEventListener('canplay', this._onCanPlay);`
+
 `source.addEventListener('canplaythrough', this._onCanPlay);`
+
 `source.addEventListener('play', this._onPlayStart.bind(this));`
+
 `source.addEventListener('pause', this._onPlayStop.bind(this));`
 
+
 下面是Texture依赖的另一个类TextureUvs
+
 `TextureUvs = require('./TextureUvs'),`
+
 这个类内容较少, 用来存储`Uvs of a texture`（猜测是预览图像，实现对象展示时的快照功能）。
 
 我们接着看材质类Texture
@@ -306,7 +340,9 @@ Texture.removeTextureFromCache = function (id){...}
     };
     
 拿到的BaseTexture对象会作为new Texture对象的BaseTexture属性。
+
 所以我们就能理清这两个类之间的关系了，BaseTexture是Texture的辅助类，是用来单纯展现或表示其材质的。
+
 Texture在他们之上添加了frame属性（frame是PIXI的矩形类），制定了材质的显示范围。他是用框架中常用的`Object.defineProperties`来巧妙地定义的。
 
     Object.defineProperties(Texture.prototype, {
@@ -346,28 +382,37 @@ Texture在他们之上添加了frame属性（frame是PIXI的矩形类），制�
     });
 
 我们什么时候需要这样来定义属性呢？
+
 我们先想一个问题，当前这个Texture类有很多属性，但是很多是使用者不需要关注的，他们可能只是用来记录状态或缓存用的。
+
 但是我们对一些关键属性的操作会影响到他们，如果不对关键属性做自定义setter处理，那么就需要开发者在执行赋值操作后人工修改那些辅助属性。这显然是不可思议的。
+
 于是`Object.defineProperties`封装关键属性的setter操作，让赋值操作能做许多其他的额外处理。这是一个健壮的框架所必须的技能。
 
 
 下面我们回到本节最初我们要看的RenderTexture类, 在我们对BaseTexture和Texture了解完毕之后,
+
 终于到了渲染部分。
 
 ### RenderTarget = require('../renderers/webgl/utils/RenderTarget'),
 
 这个类是用来webGL模式下处理最基础的绘制对象的，接受的参数中最重要的就是他的第一个参数：从canvas标签上通过getContext('webgl')方法获取到的webGL绘制对象。
+
 他依赖一个`StencilMaskStack = require('./StencilMaskStack');`遮罩相关的数据结构。
+
 
 所以，这个类中很多方法因为涉及webgl的api，所以对前端工程师来说相对比较生僻。
 
 ### FilterManager = require('../renderers/webgl/managers/FilterManager'),
+
 这个类管理整个过滤器, 继承自WebGlManage。
+
 他是webgl特有的。
 
 ### CanvasBuffer = require('../renderers/canvas/utils/CanvasBuffer'),
 
 我们知道pixi在浏览器不支持webgl的时候会切换成canvas渲染，这里封装好了一个canvas渲染器。
+
 内容比较少，我们可以一窥这个封装的过程。
 
     function CanvasBuffer(width, height)
@@ -418,23 +463,35 @@ Texture在他们之上添加了frame属性（frame是PIXI的矩形类），制�
     };
 
 可见，pixi里面的构造函数，也就是类，是非常多的。
+
 不过有很多都是装饰者模式，把其他对象封装作为自己的一个属性，然后赋予其更多的属性和方法。
+
 我们在研习框架源码的时候，一定要知道某个类的用法，确定我们操作的对象到底是谁。
+
 比如上面这个canvasBuffer类。
+
 使用这个类，本质还是在操作一个canvas的dom对象，但是却为你方便的封装了一系列简单操作。
+
 比如context已经为你制定好了就是getContext('2d')，比如调用clear就会直接清空canvas这样的。
+
 canvas为我们暴露出的api其实都是相当底层和原始的，pixi的这一层封装就像是研磨不平滑的平面，是很有必要的。
+
 
 我们说完了RenderTexture的依赖，终于可以看看他本身了。
 
 ### RenderTexture = require('../textures/RenderTexture'),
 
 A RenderTexture is a special texture that allows any Pixi display object to be rendered to it.
+
 注释是这样介绍他的，RenderTexture是一个特殊的材质，允许任何Pixi的displayObject用它来进行渲染。
+
 所有的材质都要被预加载，否则就会呈现出一个黑色矩形。
+
 同时RenderTexture还会为displayobject提供一个无关位置和旋转角度的快照。我们有理由相信这个功能一定来自TextureUvs类。
 
+
 function RenderTexture(renderer, width, height, scaleMode, resolution){...}
+
 其接受五个参数：
 
 * renderer {PIXI.CanvasRenderer|PIXI.WebGLRenderer} 渲染器
@@ -467,6 +524,7 @@ function RenderTexture(renderer, width, height, scaleMode, resolution){...}
 毫无疑问，webGl模式的渲染会更强大，相对的，源码内部的实现方式也复杂点，不过用户并不要关心webgl与canvas的切换。他们的切换是自动且封装完毕的。除非有指定渲染模式的特殊需求。
 
 RenderTexture提供了一个获取渲染结果的方法。
+
 他是由该类连续三个方法实现的。
 
     RenderTexture.prototype.getImage = function ()
@@ -503,15 +561,25 @@ RenderTexture提供了一个获取渲染结果的方法。
     };
 
 这个例子可以很好的诠释面向对象编程中方法“职责”的边界依据。
+
 从一个只想获取iamge对象的开发者的角度，getImage还要依次执行getBase64和getCanvas方法，一个getImage方法拆分成三段简直蠢得可以。
+
 但是假如其他开发者只想获取这个canvas的base64信息或只是canvas本身呢？
+
 按照那个“聪明”的开发者想法，我们还得重写个包含getCanvas的getBase64方法和裸的getCanvas方法。
+
 原本A+B+C式的定义方法，牺牲了一部分可读性和连贯性。但是换来了结构的清晰和三个耦合度极低的API。
+
 如果变成ABC+BC+C的模式，只为了每个方法的流畅，却增加了大量的冗余代码。得不偿失。
+
 而且，后者还完全没有考虑框架的扩展性，每次在调用链上增加一个方法，都是N（N是之前调用链长度）倍于前者的代码冗余！
+
 所以说，这三个方法的定义很规范也很巧妙。
+
 他们之前分工明确，功能清晰，每个都可以独立成一个API。从任何一个方法切入都不会有功能差错。
+
 这就是一个健壮的库提供的API的标准。也是面向对象编程中将一个大的方法拆分成块的依据。
+
 
 RenderTexture类还有获取全部像素和单个像素的两个原型方法。我们已经知道PIXI会有两套渲染模式，如果对webGL模式不熟悉，我们直接看稍微熟悉点的canvas方法吧，这也是种快速理解源码的办法。
 
