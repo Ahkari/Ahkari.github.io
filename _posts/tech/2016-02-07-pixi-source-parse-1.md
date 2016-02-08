@@ -12,8 +12,11 @@ description: pixi源码解析第一章
 
 ![pixi-最外层index](http://7xny7k.com1.z0.glb.clouddn.com/pixi1.png)
 pixi在commonJS模范下会首先按顺序加载图示模块，
+
 然后实例化一个`loader`，
+
 接着将`deprecation`中的那些旧版存在，而目前pixi已不再支持的特性做兼容性提示。
+
 最后映射到全局属性`global`里。
 
 我们来看前后两个比较杂的模块
@@ -93,8 +96,8 @@ require会在当前js文件目录开始索引获取目标js的export值，如果
 ### Object.assign(core, require('./deprecation'));
 之前说过了, 这个是用来兼容旧版的, 如果你在新版pixi里使用旧版有而新版没有的对象就会报错。
 
-这个文件里会将每个可能出错的地方整理并给出合理的提示。
-这是一个成熟的框架所必须的素养。
+这个文件里会将每个可能出错的地方整理并给出合理的提示。这是一个成熟的框架所必须的素养。
+
 我们整理下这个文件里的提示。来认识下pixi v3所做的改动。
 
 1. core.SpriteBatch 这个对象已不存在，不要尝试new它，请用new ParticleContainer来替代。
@@ -186,19 +189,21 @@ require会在当前js文件目录开始索引获取目标js的export值，如果
 ### require('./const')
 写着所有的静态变量。
 可能需要关注的几个是：
-`TARGET_FPMS:0.06`期望是0.06秒一帧
-`RENDERER_TYPE:{ UNKNOWN:0 , WEBGL: 1 , CANVAS: 2}`设定渲染模式映射
-`BLEND_MODES:{...}`混合模式映射
-`DRAW_MODES:{...}`webGL绘制模式
-`SCALE_MODES:{...}`拉伸模式
-`RETINA_PREFIX: /@(.+)x/`声明这是种高分辨率的素材时要加的前缀
-`RESOLUTION:1`分辨率
-`FILTER_RESOLUTION:1`滤镜分辨率
-`DEFAULT_RENDER_OPTIONS:{...}`默认渲染配置（重要）
-`SHAPES:{...}`支持的形状的映射
+
+* `TARGET_FPMS:0.06`期望是0.06秒一帧
+* `RENDERER_TYPE:{ UNKNOWN:0 , WEBGL: 1 , CANVAS: 2}`设定渲染模式映射
+* `BLEND_MODES:{...}`混合模式映射
+* `DRAW_MODES:{...}`webGL绘制模式
+* `SCALE_MODES:{...}`拉伸模式
+* `RETINA_PREFIX: /@(.+)x/`声明这是种高分辨率的素材时要加的前缀
+* `RESOLUTION:1`分辨率
+* `FILTER_RESOLUTION:1`滤镜分辨率
+* `DEFAULT_RENDER_OPTIONS:{...}`默认渲染配置（重要）
+* `SHAPES:{...}`支持的形状的映射
 
 ### require('./math')
 数学相关的计算在这里引入。
+
 目标路径是math文件夹，其中包含了各种形状之间的运算。虽然都是二维图形运算，但全部看明白也需要一点的数学功底。
     
 1. PIXI.Point
@@ -215,11 +220,17 @@ require会在当前js文件目录开始索引获取目标js的export值，如果
 ![二维矩阵运算](http://7xny7k.com1.z0.glb.clouddn.com/pixi1.jpg)
 
 浏览器既然也是通过矩阵运算的方式把css3效果转换为matrix来执行，pixi自然也是一样。
+
 我们根据上图总结出如下规律:
+
 1, 4 是缩放变形的结果　　scale(sx,sy)可以由matrix(sx,0,0,sy,0,0)转变
+
 5, 6 是平移变形的结果　　translate(tx,ty)可以由matrix(1,0,0,1,tx,ty)转换而来，
+
 2, 3 是扭曲变形的结果　　skew(θx，θy)可以由matrix(1,tan(θy),tan(θx),1,0,0)转变过来
+
 1, 2, 3, 4 是旋转变形的结果　　rotate(θ)可以有matrix(cosθ,sinθ,-sinθ,cosθ,0,0)转变而来
+
 其原型方法：
     
     * PIXI.Matrix.formArray(array) 应用此数组作为矩阵新的属性
@@ -261,6 +272,7 @@ require会在当前js文件目录开始索引获取目标js的export值，如果
     * PIXI.Circle.getBounds() 返回刚好能把这个圆圈住的矩形范围   
 5. PIXI.Ellipse
 椭圆类。属性有位置x,y，宽高width，height，类型3
+
 方法同圆形，究竟是后续要有椭圆的额外操作还是PIXI当前不支持椭圆呢，这个疑问我们阅读到后面才能知道。
 6. PIXI.Polygon
 多边形类。期望传入的参数是一堆表示每个顶点位置的数组。

@@ -316,13 +316,13 @@ VideoBaseTexture类继承自BaseTexture类。所以onload这些过程便不需�
 最终的这个材质类集合了之前的所有的辅助材质类。
 从他所暴露出的接口就可以看出，无论是来自image还是canvas还是video，都会用对应的辅助类来处理。
 
-Texture.fromImage = function (imageUrl, crossorigin, scaleMode){...}
-Texture.fromFrame = function (frameId){...}
-Texture.fromCanvas = function (canvas, scaleMode){...}
-Texture.fromVideo = function (video, scaleMode){...}
-Texture.fromVideoUrl = function (videoUrl, scaleMode){...}
-Texture.addTextureToCache = function (texture, id){...}
-Texture.removeTextureFromCache = function (id){...}
+    Texture.fromImage = function (imageUrl, crossorigin, scaleMode){...}
+    Texture.fromFrame = function (frameId){...}
+    Texture.fromCanvas = function (canvas, scaleMode){...}
+    Texture.fromVideo = function (video, scaleMode){...}
+    Texture.fromVideoUrl = function (videoUrl, scaleMode){...}
+    Texture.addTextureToCache = function (texture, id){...}
+    Texture.removeTextureFromCache = function (id){...}
 
 上述方法里都会将生成的BaseTexture作为参数来初始化Texture, 例如这样：
 
