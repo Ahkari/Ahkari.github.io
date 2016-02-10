@@ -11,6 +11,7 @@ description: pixi源码解析第一章
 请于github下载pixi源码，我以16.1月份v3版本的为准。
 
 ![pixi-最外层index](http://7xny7k.com1.z0.glb.clouddn.com/pixi1.png)
+
 pixi在commonJS模范下会首先按顺序加载图示模块，
 
 然后实例化一个`loader`，

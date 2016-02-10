@@ -7,7 +7,9 @@ description: pixi源码解析第二章
 ---
 
 之前我们做做热身看了看工具类，现在正式进入游戏引擎核心。
+
 DisplayObject类需要一个我们之前没有看的类, RenderTexture类。
+
 他在DiaplayObject类上是这么引入的，
 
 `RenderTexture = require('../textures/RenderTexture'),`
@@ -39,7 +41,7 @@ DisplayObject类需要一个我们之前没有看的类, RenderTexture类。
 
 163行， `BaseTexture.prototype = Object.create(EventEmitter.prototype);`
 
-该类的继承自事件类。从基础材质类开始, PIXI终于开始引入了事件机制, 往后的源码中将有很多的hock函数。
+该类的继承自node的事件模块。从基础材质类开始, PIXI终于开始引入了事件机制, 往后的源码中将有很多的hook钩子函数。
 
 那么我们中途稍微学习下这个EventEmitter的源码，我们可以通过查看pixi.js浏览器版本来看node里定义的这个模块代码都有啥：
 
@@ -131,7 +133,7 @@ DisplayObject类需要一个我们之前没有看的类, RenderTexture类。
     
 源于node的这个事件模块的代码我们看完了，就可以理解pixi里面的这些事件机制了。
 
-基本套路就是on或once对指定事件注册回调方法，通过emit来触发。
+基本套路就是on或once对指定事件注册回调方法，通过emit来触发这些已存在的回调。
 
     BaseTexture.prototype.update = function ()
     {
@@ -140,10 +142,10 @@ DisplayObject类需要一个我们之前没有看的类, RenderTexture类。
     };
     ...
     source.onload = function ()
-        {
-            '''
-            scope.emit('loaded', scope); //资源载入完毕时, 会触发loaded事件
-        };
+    {
+        '''
+        scope.emit('loaded', scope); //资源载入完毕时, 会触发loaded事件
+    };
 
 下面我们节选一个方法来看pixi对于整体框架里的对象是如何管理的:
 
