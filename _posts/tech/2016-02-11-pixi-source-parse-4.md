@@ -1,6 +1,6 @@
 ---
 layout: post
-title: PIXI v3源码解析 其四已
+title: PIXI v3源码解析 其四
 category: 技术
 tags: pixiJS 源码解析 
 description: pixi源码解析第四章
