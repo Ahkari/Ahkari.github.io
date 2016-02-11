@@ -251,7 +251,7 @@ PIXI位处于浏览器的环境之下，所以一定会有和鼠标键盘的交�
 
 `textureParser:require('./textureParser'),`异步加载材质
 
-`Resource:require('resource-loader').Resource`github地址https://github.com/englercj/resource-loader, 是用这个库拓展而来的。专为web游戏而生的资源加载器。
+`Resource:require('resource-loader').Resource`github地址[Resource-loader](https://github.com/englercj/resource-loader), 是用这个库拓展而来的。专为web游戏而生的资源加载器。
 
 ### core.mesh = require('./mesh');
 其依赖关系如下:
