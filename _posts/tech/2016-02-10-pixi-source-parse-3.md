@@ -266,6 +266,7 @@ displayObject中还有个抽象方法是renderWebgl与renderCanvas。在这些�
 用处是操作canvas的着色或材质。
 
 提供了如下几个方法：
+
 * CanvasTinter.getTintedTexture 获取目标着色材质
 * CanvasTinter.tintWithMultiply 用复合模式着色
 * CanvasTinter.tintWithOverlay 用覆盖模式着色
