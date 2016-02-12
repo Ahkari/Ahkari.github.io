@@ -1,7 +1,7 @@
 ---
 layout: post
-title: 呵呵哒
+title: PIXI v3源码解析 其五
 category: 技术
 tags: pixiJS 源码解析 
-description: pxi
+description: pixi源码解析第五章
 ---
