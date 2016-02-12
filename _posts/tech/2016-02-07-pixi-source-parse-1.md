@@ -12,7 +12,7 @@ description: pixi源码解析第一章
 
 ![pixi-最外层index](http://7xny7k.com1.z0.glb.clouddn.com/pixi1.png)
 
-pixi在commonJS模范下会首先按顺序加载图示模块，
+pixi遵循模块化开发理念，在commonJS模范下会首先按顺序加载图示模块，
 
 然后实例化一个`loader`，
 
@@ -20,16 +20,18 @@ pixi在commonJS模范下会首先按顺序加载图示模块，
 
 最后映射到全局属性`global`里。
 
-我们来看前后两个比较杂的模块
+我们先来看前后两个比较杂的模块
 `./polyfill`和`./depreciation`
 
 ### 概念补习
 PIXI源码中有一些方法，了解他们有助于源码阅读。
 
 1. require()
-require会在当前js文件目录开始索引获取目标js的export值，如果目标是文件夹则默认取其中index.js的exports
+require会从path路径索引目标js，如果目标是文件夹则默认取其中index.js的exports出的内容。
 2. Object.assign(tar,orgin)
 将orgin的**可枚举**属性拷贝到tar对象上，返回tar对象。 PIXI有这部分的功能增强。 
+3. Object.create( orgin ) 
+一般用于原型的继承, 生成一个以origin为原型的对象, 让原型式继承层级关系符合预期。
 
 ### require('./polyfill')
 1. Object.assign.js 用来fix这个方法
@@ -95,7 +97,9 @@ require会在当前js文件目录开始索引获取目标js的export值，如果
         }
 
 ### Object.assign(core, require('./deprecation'));
-之前说过了, 这个是用来兼容旧版的, 如果你在新版pixi里使用旧版有而新版没有的对象就会报错。
+之前说过了, 这个`deprecation`是一些不推荐使用的内容了。
+
+是用来兼容旧版的, 如果你在新版pixi里使用旧版有而新版没有的对象就会报错。
 
 这个文件里会将每个可能出错的地方整理并给出合理的提示。这是一个成熟的框架所必须的素养。
 
@@ -126,7 +130,7 @@ require会在当前js文件目录开始索引获取目标js的export值，如果
 23. core.utils.uuid 这个方法更名为core.utils.uid();
 
 ### var core = module.exports = require('./core');
-我们进入core核心部分。其下index.js里面有他所需的所有子对象的内容。
+我们进入core核心部分。其下index.js里面有他所需的所有子模块的内容。
 
     var core = module.exports = Object.assign(require('./const'), require('./math'), {
         // utils工具类
@@ -135,18 +139,18 @@ require会在当前js文件目录开始索引获取目标js的export值，如果
         // display基础展示对象
         DisplayObject:          require('./display/DisplayObject'),
         Container:              require('./display/Container'),
-        // sprites高级点的精灵
+        // sprites高级点的精灵对象
         Sprite:                 require('./sprites/Sprite'),
         ParticleContainer:      require('./particles/ParticleContainer'),
         SpriteRenderer:         require('./sprites/webgl/SpriteRenderer'),
         ParticleRenderer:       require('./particles/webgl/ParticleRenderer'),
         // text文本类
         Text:                   require('./text/Text'),
-        // primitives图形元素
+        // primitives形状元素
         Graphics:               require('./graphics/Graphics'),
         GraphicsData:           require('./graphics/GraphicsData'),
         GraphicsRenderer:       require('./graphics/webgl/GraphicsRenderer'),
-        // textures材质类
+        // textures材质类。是非形状元素的展示基础。
         Texture:                require('./textures/Texture'),
         BaseTexture:            require('./textures/BaseTexture'),
         RenderTexture:          require('./textures/RenderTexture'),
@@ -184,12 +188,13 @@ require会在当前js文件目录开始索引获取目标js的export值，如果
         }
     });
 
-在webGL和canvas间切换是pixi的特色之一。基于其之上的游戏引擎phaser也拿这个作为特色。
+在webGL和canvas间智能切换是pixi的特色之一。基于其之上的游戏引擎phaser也拿这个作为特色。
+
 我们来一个个看核心库的内容。
 
 ### require('./const')
 写着所有的静态变量。
-可能需要关注的几个是：
+需要关注的几个是：
 
 * `TARGET_FPMS:0.06`期望是0.06秒一帧
 * `RENDERER_TYPE:{ UNKNOWN:0 , WEBGL: 1 , CANVAS: 2}`设定渲染模式映射
@@ -203,12 +208,12 @@ require会在当前js文件目录开始索引获取目标js的export值，如果
 * `SHAPES:{...}`支持的形状的映射
 
 ### require('./math')
-数学相关的计算在这里引入。
+数学相关的计算。
 
-目标路径是math文件夹，其中包含了各种形状之间的运算。虽然都是二维图形运算，但全部看明白也需要一点的数学功底。
+目标路径是math文件夹，其中包含了各种形状之间的运算。虽然都是二维图形运算，但全部看明白也需要一点的初中数学功底。
     
 1. PIXI.Point
-这是用于表示一个二维坐标点的类。含有X和Y两个属性与四个方法，它是二维运算的一个基础类：
+用于表示一个二维坐标点的类。含有X和Y两个属性与四个方法，它是二维运算的一个基础类：
         
     * PIXI.Point.clone() 返回一个和当前点XY值一样的新二维坐标
     * PIXI.Point.copy(point) 将参数坐标点赋给当前点
@@ -216,11 +221,11 @@ require会在当前js文件目录开始索引获取目标js的export值，如果
     * PIXI.Point.set(x,y) 
         
 2. PIXI.Matrix
-表示二位矩阵的类，含有六个属性[a,b,c,d,e,f]。可以实现css3那样的所有变形效果。补充知识如下:
+二位矩阵的类，含有六个属性[a,b,c,d,e,f]。可以实现css3那样的所有变形效果。补充知识如下:
 
 ![二维矩阵运算](http://7xny7k.com1.z0.glb.clouddn.com/pixi1.jpg)
 
-浏览器既然也是通过矩阵运算的方式把css3效果转换为matrix来执行，pixi自然也是一样。
+浏览器通过矩阵运算的方式运算matrix来实现css3，pixi自然也是一样。
 
 我们根据上图总结出如下规律:
 
@@ -275,6 +280,8 @@ require会在当前js文件目录开始索引获取目标js的export值，如果
 椭圆类。属性有位置x,y，宽高width，height，类型3
 
 方法同圆形，究竟是后续要有椭圆的额外操作还是PIXI当前不支持椭圆呢，这个疑问我们阅读到后面才能知道。
+
+2月12号回顾：这个问题已经解决，PIXI用了画四段贝赛尔曲线的方式来绘制椭圆。
 6. PIXI.Polygon
 多边形类。期望传入的参数是一堆表示每个顶点位置的数组。
     * PIXI.Polygon.clone() 
@@ -302,7 +309,7 @@ require会在当前js文件目录开始索引获取目标js的export值，如果
 ### utils : require('./utils')
 一些小的工具方法，他require了node的事件注册模块'eventemitter3',异步模块'async'和自己的pluginTarget模块。
 
-* PIXI.utils.EventEmitter 采用node的事件模式，本质是一种观察者模式。
+* PIXI.utils.EventEmitter 采用node的事件模式，是一种观察者模式。
 * PIXI.utils.async node的异步模块。解决异步代码嵌套过深的问题。
 * PIXI.utils.hex2rgb 16进制转为rgb色彩模式
 * PIXI.utils.hex2string 16进制转为#XXXXXX颜色表示
@@ -333,7 +340,7 @@ require会在当前js文件目录开始索引获取目标js的export值，如果
         },
 * PIXI.utils.getNextPowerOfTwo
 * PIXI.utils.isPowerOfTwo
-* PIXI.utils. getResolutionOfUrl
+* PIXI.utils.getResolutionOfUrl
 * PIXI.utils.sayHello 打个招呼~
 * PIXI.utils.isWebGLSupported 重要，是否支持webGL
     
@@ -359,8 +366,8 @@ require会在当前js文件目录开始索引获取目标js的export值，如果
 * PIXI.utils.TextureCache = {}  //缓存
 * PIXI.utils.BaseTextureCache = {}  //
 * PIXI.utils.pluginTarget.mixin(obj) 
-    这是PIXI的插件拓展方式。传入一个对象。这个对象便赋予了`registerPlugin`注册插件`initPlugins`初始化插件`destroyPlugins`销毁插件的方法。具体插件实现需要注册时传入的构造函数来定，这里PIXI只是提供了一个供发挥的接口。
+    这是PIXI的插件拓展方式。传入一个对象。这个对象便赋予了`registerPlugin`注册插件`initPlugins`初始化插件`destroyPlugins`销毁插件的方法。具体插件实现由注册时传入的构造函数来定，这里PIXI只是提供了一个供发挥的接口。
 
 
 ### tickers : require('./ticker') 
-时钟类。用于计算动画帧率等。
+时钟类。用于控制渲染帧率等。

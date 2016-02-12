@@ -14,7 +14,7 @@ description: pixi源码解析第四章
 PIXI的text本身的一系列文本特有的如自动换行等特性都是自己实现的，我们挑选几个来看看Text和Sprite究竟有什么的不同。
 
 来看wordWrap自动换行的实现方法：本质是文字的预处理，在可能导致换行的地方手动添加`\n`。
-主要在用与判断当前text文本是否要换行的if判断和之后的操作很巧妙。
+主要在用与判断当前text文本是否要换行的if判断和之后的操作很巧妙。(因为英文有空格的存在, 所以判断方式会更麻烦点。)
 
     Text.prototype.wordWrap = function (text)
     {
@@ -52,7 +52,7 @@ PIXI的text本身的一系列文本特有的如自动换行等特性都是自己
         return result;
     };
 
-有个属性很有意思, 叫`dirty`。在width的getter函数上，我们发现`dirty=true`的时候我们需要先对他进行text更新。如果你有接触过数据绑定相关框架的知识，就应该隐约知道，这个`dirty`作用就是**脏检查**。
+有个属性很有意思, 叫`dirty`。在width的getter函数上，我们发现`dirty=true`的时候我们需要先对他进行text更新。如果你有接触过数据绑定相关框架的知识，就应该隐约知道，这个`dirty`作用就是**脏检查**的判断标识。
 
     width: {
         get: function ()
@@ -248,7 +248,7 @@ CanvasGraphics是一个普通对象，不是一个类，直接面向过程。
 
 它同Sprite一样继承自Container类。也即是说，他是和Sprite一样能展现的物体。
 
-如果说Sprite倾向于来自材质，那么Graphics就是来自几何。
+如果说Sprite来自材质，那么Graphics就是来自几何。
 
 所以他具有如下几何属性：
 
@@ -298,10 +298,11 @@ CanvasGraphics是一个普通对象，不是一个类，直接面向过程。
 
 ### GraphicsRenderer: require('./graphics/webgl/GraphicsRenderer'),
 PIXI里面webgl的渲染都是单独拿出来做一个类来解释的。
+
 比如这里，我们用canvasAPI直接实现的形状绘制需要我们用webgl来重新实现一遍。
 
 这里我们要依次对几个形状进行build。
-再build多边形的时候我们用到了一个叫earcut的库。他是最快最轻量的js操作webgl多变形的库。
+再build多边形的时候我们用到了一个叫earcut的库。他是最快最轻量的js操作webgl多边形的库。
 [Earcut-webgl操作多变形](https://github.com/mapbox/earcut)
 
 接下来的依赖我们之前都一个个解析过了：
@@ -354,6 +355,6 @@ PIXI里面webgl的渲染都是单独拿出来做一个类来解释的。
 
 我们所理解的PIXIjs本质就是一个渲染引擎，为我们提供的可操作的物体最高也只到了Sprite这样的自由度。
 
-底层基于PIXI，封装一层逻辑操作层让PIXI功能更为强大甚至做出酷炫的游戏。有这样的框架，最有名的应该就是phaser。而我司一直干的也是这件事。
+底层基于PIXI，封装一层逻辑操作层让PIXI功能更为强大甚至做出酷炫的游戏。有这样的框架，最有名的应该就是phaser。而我司一直干的也是和phaser一样的事。
 
 下一节，我们会分析除了core以外的辅助类。

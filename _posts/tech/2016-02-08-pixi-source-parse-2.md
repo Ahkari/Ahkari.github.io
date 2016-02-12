@@ -19,7 +19,7 @@ DisplayObject类需要一个我们之前没有看的类, RenderTexture类。
 下面先我们插播材质类的解析，按照他的引用一步步分析。
 
 ### BaseTexture = require('./BaseTexture'),
-渲染材质类依赖的第一个类是基础材质类BaseTexture。
+材质类依赖的第一个类是基础材质类BaseTexture。
 
 构造时接受三个参数, 分别是材质源, 拉伸模式, 分辨率。
 
@@ -41,9 +41,9 @@ DisplayObject类需要一个我们之前没有看的类, RenderTexture类。
 
 163行， `BaseTexture.prototype = Object.create(EventEmitter.prototype);`
 
-该类的继承自node的事件模块。从基础材质类开始, PIXI终于开始引入了事件机制, 往后的源码中将有很多的hook钩子函数。
+该类的继承自node的事件模块。从基础材质类开始, PIXI开始引入了事件机制, 往后的源码中将有很多的hook钩子函数。
 
-那么我们中途稍微学习下这个EventEmitter的源码，我们可以通过查看pixi.js浏览器版本来看node里定义的这个模块代码都有啥：
+我们学习下这个EventEmitter的源码，我们可以通过查看pixi.js浏览器版本来看node里定义的这个是个什么样的模块：
 
     var prefix = typeof Object.create !== 'function' ? '~' : false; //是否需要前缀
     function EE(fn, context, once) { //监听器，含有需要执行的方法，执行源，以及是否单次这三个属性
@@ -131,9 +131,9 @@ DisplayObject类需要一个我们之前没有看的类, RenderTexture类。
       return this;
     };
     
-源于node的这个事件模块的代码我们看完了，就可以理解pixi里面的这些事件机制了。
+看完了就可以理解pixi里面的事件机制了。
 
-基本套路就是on或once对指定事件注册回调方法，通过emit来触发这些已存在的回调。
+基本套路就是on或once对指定事件注册回调方法，通过emit来触发这些已存在的回调。本质上是一种发布订阅的观察者模式。
 
     BaseTexture.prototype.update = function ()
     {
@@ -147,7 +147,7 @@ DisplayObject类需要一个我们之前没有看的类, RenderTexture类。
         scope.emit('loaded', scope); //资源载入完毕时, 会触发loaded事件
     };
 
-下面我们节选一个方法来看pixi对于整体框架里的对象是如何管理的:
+下面我们节选局部的一个方法来窥探下pixi里对于一个类是如何统一管理的:
 
     BaseTexture.prototype.destroy = function ()
     {   //材质的销毁方法
@@ -169,25 +169,33 @@ DisplayObject类需要一个我们之前没有看的类, RenderTexture类。
         this.dispose(); //触发删除该材质后的事件
     };
 
-从这个销毁方法我们可以看到: 
+从这个类的销毁方法我们可以看到: 
 
-一个健壮的类库对于其中的每个对象都是精心管理着的, 一个材质对象新建时我们会把他的信息用标识缓存起来, 统一管理还能确保不重复创建。 
+一个健壮的类库对于其中的每个类都是精心管理着的, 比如这里，
 
-同理, 销毁材质时需要把相关的内容都删除干净，去除引用。最后还可能有销毁完毕后的处置方法，让某些用到这个材质的对象都会做出相应的响应操作。
+一个材质对象新建时我们会把他的信息用全局数据结构`tils.BaseTextureCache`缓存起来, 方便管理还能确保不重复创建。 
+
+同理, 销毁材质时需要把相关的内容都删除干净，去除引用，方便js的gc对其回收。最后还可能有销毁完毕后的处置方法，让某些用到这个材质的对象都会做出相应的响应操作。
 
 
 我们在阅读这部分源码的时候会心生一个疑惑，就是基础材质的第一个参数source究竟是一个什么样的对象呢？
 
-在基础材质里对于这个对象我们操作了很多次，和他的src属性打交道，同时还有getContext方法。这个source究竟是image还是canvas对象啊？
+在基础材质里对于这个对象我们操作了很多次，不仅和他的src属性打交道，还有getContext方法。这个source究竟是image还是canvas对象啊？
 
-这时候我们可以翻看官方API文档或看源码方法注释
+这时候我们可以翻看官方API文档或看源码方法注释：
 
 ` @param source {Image|Canvas} the source object of the texture.`
 
-可见这个source可以是image对象或canvas对象, PIXI会根据对象检测自动处理的。之前源码中许多特性不够明确让人疑惑的部分很多都是分情况处理image或canvas导致的。
+可见，这个source可以是image对象或canvas对象, PIXI会根据对象检测自动处理的。
+
+js中函数天生多态，因为没有参数模式的硬性设置，所以我们可以根据参数的不同自动为其做检测。
+
+之前源码中许多让人疑惑的部分，都是因为分情况处理image或canvas导致的。
 
 
-基础材质源码的最后，有两个方法完美解决了刚才的疑惑，下面就是PIXI对于image和canvas的分别处理的入口方法。
+在这个模块源码的最后，有两个方法完美解决了刚才的疑惑：
+
+下面就是PIXI对于image和canvas对象的分别处理。
 
 这两个方法没有挂载在原型链上。可以直接作为方法调用，并返回一个`new BaseTexture()`对象。简简单单就实现了基础材质的无new式创建！
 
@@ -234,7 +242,7 @@ DisplayObject类需要一个我们之前没有看的类, RenderTexture类。
 
 ### VideoBaseTexture = require('./VideoBaseTexture'),
 
-"音乐材质"类, PIXI中音乐作为资源的一种来对待。
+"音视频材质"类, PIXI中音视频作为资源的一种来对待。用于加载音频或视频资源。
 
 核心方法`PIXI.VideoBaseTexture.fromUrl()`有四种加载url资源的方式。
 
@@ -292,7 +300,7 @@ fromVideo将dom资源顺利的引入到PIXI的VideoBaseTexture类里，并携带
 
 VideoBaseTexture类继承自BaseTexture类。所以onload这些过程便不需要再写了。
 
-只需要对音频资源做一些额外的处理。
+只需要对音视频资源做一些额外的处理。
 
 多出了一些原型方法，他们会在video触发相应的事件时触发，并修改音频材质对象的状态。
 
@@ -316,7 +324,8 @@ VideoBaseTexture类继承自BaseTexture类。所以onload这些过程便不需�
 ### Texture = require('./Texture'),
 
 最终的这个材质类集合了之前的所有的辅助材质类。
-从他所暴露出的接口就可以看出，无论是来自image还是canvas还是video，都会用对应的辅助类来处理。
+
+从他所暴露出的接口就可以看出，无论是来自image还是canvas还是video，我们调用这个类都会用对应的辅助类来差异化处理。
 
     Texture.fromImage = function (imageUrl, crossorigin, scaleMode){...}
     Texture.fromFrame = function (frameId){...}
@@ -343,7 +352,7 @@ VideoBaseTexture类继承自BaseTexture类。所以onload这些过程便不需�
 
 所以我们就能理清这两个类之间的关系了，BaseTexture是Texture的辅助类，是用来单纯展现或表示其材质的。
 
-Texture在他们之上添加了frame属性（frame是PIXI的矩形类），制定了材质的显示范围。他是用框架中常用的`Object.defineProperties`来巧妙地定义的。
+Texture在他们之上添加了frame属性（frame是PIXI的矩形类），制定了材质的显示范围。他是用框架中常用的`Object.defineProperties`方法来巧妙地定义的。
 
     Object.defineProperties(Texture.prototype, {
         frame: {
@@ -385,14 +394,14 @@ Texture在他们之上添加了frame属性（frame是PIXI的矩形类），制�
 
 我们先想一个问题，当前这个Texture类有很多属性，但是很多是使用者不需要关注的，他们可能只是用来记录状态或缓存用的。
 
-但是我们对一些关键属性的操作会影响到他们，如果不对关键属性做自定义setter处理，那么就需要开发者在执行赋值操作后人工修改那些辅助属性。这显然是不可思议的。
+但是我们对一些关键属性的操作会影响到他们，如果不对关键属性做自定义setter处理，那么就需要开发者在执行赋值操作后手动修改那些辅助属性。这显然是不可思议的。
 
-于是`Object.defineProperties`封装关键属性的setter操作，让赋值操作能做许多其他的额外处理。这是一个健壮的框架所必须的技能。
+于是`Object.defineProperties`封装关键属性的setter操作，让赋值操作能带上许多其他属性的额外处理。
 
 
 下面我们回到本节最初我们要看的RenderTexture类, 在我们对BaseTexture和Texture了解完毕之后,
 
-终于到了渲染部分。
+终于到了渲染器部分。
 
 ### RenderTarget = require('../renderers/webgl/utils/RenderTarget'),
 
@@ -490,7 +499,7 @@ A RenderTexture is a special texture that allows any Pixi display object to be r
 同时RenderTexture还会为displayobject提供一个无关位置和旋转角度的快照。我们有理由相信这个功能一定来自TextureUvs类。
 
 
-function RenderTexture(renderer, width, height, scaleMode, resolution){...}
+`function RenderTexture(renderer, width, height, scaleMode, resolution){...}`
 
 其接受五个参数：
 
@@ -502,7 +511,7 @@ function RenderTexture(renderer, width, height, scaleMode, resolution){...}
 
 对于不同渲染模式下会有不同的材质渲染方式。
 
-     if (this.renderer.type === CONST.RENDERER_TYPE.WEBGL)
+    if (this.renderer.type === CONST.RENDERER_TYPE.WEBGL)
         {
             var gl = this.renderer.gl; //webgl模式下我们textureBuffer是renderTarget实例。
             this.textureBuffer = new RenderTarget(gl, this.width, this.height, baseTexture.scaleMode, this.resolution);//, this.baseTexture.scaleMode);
@@ -560,25 +569,25 @@ RenderTexture提供了一个获取渲染结果的方法。
         }
     };
 
-这个例子可以很好的诠释面向对象编程中方法“职责”的边界依据。
+这个例子可以很好的界定面向对象编程中方法“职责”的边界。
 
 从一个只想获取iamge对象的开发者的角度，getImage还要依次执行getBase64和getCanvas方法，一个getImage方法拆分成三段简直蠢得可以。
 
-但是假如其他开发者只想获取这个canvas的base64信息或只是canvas本身呢？
+但是假如其他开发者只想获取这个canvas的base64信息或只是canvas元素本身呢？
 
-按照那个“聪明”的开发者想法，我们还得重写个包含getCanvas的getBase64方法和裸的getCanvas方法。
+按照那个“聪明”的开发者想法，我们还得重写个包含getCanvas的getBase64方法和一个裸的getCanvas方法。
 
-原本A+B+C式的定义方法，牺牲了一部分可读性和连贯性。但是换来了结构的清晰和三个耦合度极低的API。
+牺牲了一部分可读性和连贯性，A+B+C式的定义方法，换来了结构的清晰和三个耦合度极低的API。
 
 如果变成ABC+BC+C的模式，只为了每个方法的流畅，却增加了大量的冗余代码。得不偿失。
 
-而且，后者还完全没有考虑框架的扩展性，每次在调用链上增加一个方法，都是N（N是之前调用链长度）倍于前者的代码冗余！
+而且，后者还完全没有考虑框架的扩展性。每次在调用链上增加一个方法，都是N（N是之前调用链长度）倍于前者的代码冗余！
 
 所以说，这三个方法的定义很规范也很巧妙。
 
 他们之前分工明确，功能清晰，每个都可以独立成一个API。从任何一个方法切入都不会有功能差错。
 
-这就是一个健壮的库提供的API的标准。也是面向对象编程中将一个大的方法拆分成块的依据。
+这就是一个健壮的库提供的API的标准。也是面向对象编程中界定类的方法的依据。
 
 
 RenderTexture类还有获取全部像素和单个像素的两个原型方法。我们已经知道PIXI会有两套渲染模式，如果对webGL模式不熟悉，我们直接看稍微熟悉点的canvas方法吧，这也是种快速理解源码的办法。

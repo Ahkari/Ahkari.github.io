@@ -7,7 +7,7 @@ description: pixi源码解析第五章
 ---
 
 ### core.extras = require('./extras');
-为PIXI增加extras子命名空间。
+为PIXI增加extras子模块。
 
 他所暴露出的三个内部对象是：
 
@@ -21,7 +21,7 @@ description: pixi源码解析第五章
 
 ### require('./cacheAsBitmap');
 
-采用对象增强模式。
+采用类增强的方法。
 
 引入DisplayObject并为其增加了一个主属性：
 `cacheAsBitmap`, 从其defineProperties来看, 如果设为true, 我们就会把displayObject缓存为一个bitmap。
@@ -44,17 +44,18 @@ description: pixi源码解析第五章
         return null;
     };
 
-这是一个新增的方法，为什么不直接在Container的属性里面增加呢？因为按照Container的设计理念，里面的子元素并没有名字属性`name`这一说。
+这是一个新增的方法，用于直接通过对象的name来获取指定子元素。
 
-Child一直都是用index来指向的。
+为什么不直接在Container类定义的地方把这个方法和其属性写进去呢？我觉得应该有两个原因：
 
-所以如果我们想增加一个getChildByName的方法。如果为了整体框架的统一，需要从displayObject开始为所有可展示对象增加其name属性。
+1. 按照Container的设计理念，里面的子元素并没有名字属性`name`这一概念的，因为Child一直都是用index来指向的。现在有需求希望能通过name来索引，但只有在搜寻container的子元素的时候才会需要name属性。这个name的应用范围就小的可怜。所以我们希望能和原本的属性方法作区分。
+2. 这个通过name索引的需求一定是后来才出现的，为了和原来的Container区分，也就是为了表明这个方法是附加的，需要单独定义。
 
-但是现实是，只有在搜寻container的子元素的时候才会需要name索引。所以这个name的应用范围就变得小的可怜。
+所以PIXI决定，用最小的代码代价给Container增加一个通过名字搜索子元素的方法。同时还需要给displayObject加一个最基础的原型name。
 
-最后，PIXI决定，用最小的代码代价给Container增加一个通过名字搜索子元素的方法。就有了上述代码：name不是必须属性，并和用到它的原型方法共存。
+就有了上述代码单独定义的代码。
 
-这就是库用于拓展功能时的一种方法。维护大型系统的时候，既有系统的稳定也是需要头等考虑的事。
+维护大型项目的时候，如何在维护既有代码的稳定性基础上实现功能扩充也是门学问。
 
 ### require('./getGlobalPosition');
 DisplayObject新增方法`core.DisplayObject.prototype.getGlobalPosition`
@@ -151,7 +152,6 @@ PIXI位处于浏览器的环境之下，所以一定会有和鼠标键盘的交�
         require('./interactiveTarget')
     );
 
-对displayObject增加了
 为canvas增加事件监听：
 
     InteractionManager.prototype.addEvents = function ()
@@ -264,7 +264,7 @@ PIXI位处于浏览器的环境之下，所以一定会有和鼠标键盘的交�
         MeshShader:     require('./webgl/MeshShader')
     };
 
-用于实现网状材质和线性材质。不再赘述。
+用于实现网状材质和线性材质。可以实现一些扭曲的效果。
 
 至此PIXI v3的源码已解析完毕。
 
@@ -274,7 +274,7 @@ PIXI位处于浏览器的环境之下，所以一定会有和鼠标键盘的交�
 
 所以我建议直接看demo。
 
-[PIXI最容易懂得在线代码](http://pixijs.github.io/examples/)
+[PIXI最容易懂得在线demo](http://pixijs.github.io/examples/)
 
 遇到不是很理解的部分再回去查看源码，等demo全部弄懂后基本就完全掌握PIXI啦。
 

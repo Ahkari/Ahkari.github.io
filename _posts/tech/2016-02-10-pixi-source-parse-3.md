@@ -11,7 +11,7 @@ description: pixi源码解析第三章
 ### DisplayObject: require('./display/DisplayObject'),
 我们研究完了相对抽象的材质类们，DisplayObject类终于以一种“看得见摸得着”的可描述二维物体状态站在了我们面前。
 
-一个DisplayObject是PIXI中用来展示的最基础的实体对象，基础到直接继承自EventEmitter类。
+一个DisplayObject是PIXI中可展示对象的基础，基础到直接继承自EventEmitter类。
 
 但是他却是一个抽象类，作为所有待展示对象的基类。他提供了很多待复写的方法，这些方法本身并不能起到预期的作用，只有被继承之后复写了才有意义。
 
@@ -40,7 +40,9 @@ description: pixi源码解析第三章
 * y 同理
 * worldVisible 很有趣的属性, 我们从其getter方法了解到, 如果他自身或任何一个父元素不可见, 那他就是false, 否则就是true。仅凭这点信息我们就可以猜测出PIXI是如何为物体扩展出一个visible属性了。
 
-即每个元素自身有个visible和worldVisible属性，两个任何一个为false时，PIXI在渲染就会忽略他。同时也宣告了visible的所有子元素都不可见，因为他们的worldVisible都会是false。
+即每个元素自身有个visible和worldVisible属性，两个任何一个为false时，PIXI渲染时就会忽略他。
+
+当然这个父元素的visible为false同时也宣告了visible的所有子元素都不可见，因为他们的worldVisible都会是false。
 
         worldVisible: {
             get: function ()
@@ -72,7 +74,7 @@ description: pixi源码解析第三章
         };
 
     这个原型方法是用来获取元素展示的边界的，可是却意外的返回一个定值。
-没错，如开始所说，displayObject是一个抽象类，他本身不能用于展示物体，他等待着被子类继承重写内部方法。
+没错，如开始所说，displayObject是一个抽象类，他本身不能用于展示物体，他等待着被子类继承后重写内部方法。
 
 如果是java的话，会很清晰明确的告知这就是个抽象类，而且会在尝试实例化的时候报错。
 
@@ -86,7 +88,8 @@ description: pixi源码解析第三章
             // OVERWRITE;
         };
 
-* DisplayObject.prototype.setParent 从源码我们又看出了端倪。
+* DisplayObject.prototype.setParent 从源码我们又看出些有趣的东西。
+
 如果我们要把给一个对象设置父元素，需要这个父元素存在且有addChild方法。难道只是有个addChild方法就能添加子元素了吗，理论上是的，但是从Error的内容来看，这个父元素又必须是一个`Container`。
 
 我们就可以推测出：PIXI必然有专门用来包裹子元素的Container容器类，这里没有用intansceOf来判断父元素实例化自哪里，说明有多个子类继承自Container，同时也避免了我们子类继承Container时报错。这里通过判断addChild方法的是否存在这种这种弱检测，缓和了判断条件也提高了框架的容错性。当然，代价是严谨度。
@@ -164,7 +167,7 @@ but，这并不能代表所有的容器这个add方法都适用。
 
 等等.
 
-采用哪种方式是根据数据风格来定的。
+采用哪种方式是根据框架的数据结构风格来定的。
 
 在此之后我们需要重写addChild方法，现在不仅需要index，还要指定所属标签。
 
@@ -228,7 +231,7 @@ displayObject中还有个抽象方法是renderWebgl与renderCanvas。在这些�
     }
     if (this._mask)
     {
-        renderer.maskManager.pushMask(this, this._mask); //正确使用着找的方法
+        renderer.maskManager.pushMask(this, this._mask); //正确使用遮罩的方法
     }
 
 回溯之前的代码可是阅读源码重要的一步，我们看之前的滤镜和遮罩管理的类。
@@ -277,7 +280,7 @@ displayObject中还有个抽象方法是renderWebgl与renderCanvas。在这些�
 
 Container.call(this); 夭寿啦，Sprite继承自Container！
 
-也就是说PIXI里面的精灵都可以有子元素，并不一定是个狭义上的只能包含物体的容器。
+也就是说PIXI里面的精灵都可以有子元素，精灵并不一定是个狭义上的单个物体。
 
 到Sprite这一步时，PIXI终于有一个确实能展示自身的类了。
 
@@ -336,7 +339,7 @@ Container的宽高通过definedProperty定义，是其中所有全部子元素�
         return new Sprite(Texture.fromImage(imageId, crossorigin, scaleMode));
     };
 
-Sprite可以直接从图片生成，因为这个方法已经悄悄为你新建了一个可应用的材质。
+Sprite可以直接从图片生成，因为这个方法已经悄悄为你新建了一个可应用的材质类。
 
 
 ### ParticleContainer: require('./particles/ParticleContainer'),
@@ -505,7 +508,7 @@ ObjectRender本身也是个抽象类，其定义了start，stop，flush，render
 
 在研究他们到底是什么之前, 我们需要先入门下webGL绘图。
 
-没错，我们到现在为止遇到webGL相关的基本就一头雾水，我们来自主绘制下图：
+没错，我们到现在为止遇到webGL相关的基本就一头雾水，我们来从头开始绘制下面这个图：
 原教程地址：[welGL入门-绘制多边形](http://blog.csdn.net/lufy_legend/article/details/38446243)
 
 ![webGL绘图demo](http://7xny7k.com1.z0.glb.clouddn.com/webGLdemo.jpg)
@@ -700,6 +703,7 @@ ObjectRender本身也是个抽象类，其定义了start，stop，flush，render
 集齐了三个龙珠（误）。
 加载了TextureShader，ComplexPrimitiveShader，PrimitiveShader三个模块后，我们就可以用ShaderManager来对他们进行管理了。
 管理器Manager这些类，全部继承自WebGLManager类，几乎覆写了全部方法。所以每个特定的管理器类各自的特性就尤为重要。
+
 着色器管理类`ShaderManager`特性主要是：onContextChange方法调用时初始化全部的三个着色器模块，他有自己的设置着色器方法，这样就可以实现对着色器的管理。
 
 * MaskManager = require('./managers/MaskManager'),
@@ -805,7 +809,7 @@ WebGLRender会把场景和其中所有的内容都渲染在一个开启了webgl�
 ### SpriteRenderer: require('./sprites/webgl/SpriteRenderer'),
 对啊，就是这个。sprite的webGL渲染器。
 
-在看了那么多的渲染相关的方法之后，对于这个sprit渲染器的功能已经不需要赘述了。
+在看了那么多的渲染相关的方法之后，对于这个sprit渲染器的功能已经不需要再说了。
 
 ### ParticleRenderer: require('./particles/webgl/ParticleRenderer'),
 粒子的webgl渲染方法因为渲染对象的差异性，还需要额外引入两个文件。
