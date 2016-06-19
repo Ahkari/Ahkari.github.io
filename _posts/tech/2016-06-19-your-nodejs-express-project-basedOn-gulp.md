@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  搭建你的express中间层！
+title:  搭建你自己的express中间层！
 category: 技术
 tags: nodejs express gulp
 description: 介绍一个基于gulp工程化的nodejs中间层种子项目
@@ -8,24 +8,31 @@ description: 介绍一个基于gulp工程化的nodejs中间层种子项目
 
 ### 知识背景
 1. 前端: 
+
 	狭义上的前端掌握html,css和javascript，据此在浏览器里面写出网页或web应用。然而这一层在整个网站的架构层面是狭小的，没有路由控制的网站，或是说，没有中间层的网站在功能上是不足以撑起多变的业务需求的。所以，现在的标准技术栈的前端是需要掌控到整个view层的。
 
 2. nodejs
+
 	nodejs的出现，将前端技术栈带到了“多维时代”。如果说一门语言限定了一个程序员的职能范畴的话，javascript程序员本来只能无奈的被禁锢在浏览器服务端，做些后端程序员嗤之以鼻的微小的工作。现在有了nodejs，前端工程师的职能将限定为整个view层，掌控全局。
 
 3. express框架
+
 	一个语言的兴起，有时候只需要一个框架。比如rails之于ruby。express虽然还没有到rails独揽江山的程度，但是已经是nodejs上最流行的服务端框架了。比起koa，他拥有完整的route和view功能。适合初次接触nodejs后端的js程序员。
 
 4. gulp工程化工具
+
 	基于express这种后端框架，一个能负责整个view层的项目其实已经能搞定了。但是和传统后端程序不同，前端项目里含有大量的图片，css和js脚本这些资源，他们都是在浏览器接受服务端html结果后自行发起网络才开始加载的。这些资源并没有域的限制，也不需要严格的安全性。所以他们一般都是放在CDN服务上，通过CDN的加速来实现静态资源高速下载。于是我们就需要对文件源码目录进行编译操作，实现静态资源的压缩和规则化。Gulp和两年前特别流行的grunt不同，回归编写js代码来实行任务的思路，同时基于流的“管道符处理思想”，能大大提高task任务的执行速度！
 
 5. route路由
+
 	所谓的路由，就是MVC模型中的controller层。在web体系下，可以理解他就是对不同的url进行不同的响应。
 
 6. 其他的概念
+
 	自己去看吧。也没啥好说的。今天要说的种子项目里并没有什么问题层的东西。
 
 ### 真丶五分钟弄出个后端项目
+
 1. 来俺的Github上弄这个项目下来。[ehsy项目种子文件](https://github.com/Ahkari/ehsySeed/)，随便你克隆还是fork还是doowload zip包。
 
 2. 去下载一个webStorm，不然你要是在命令行里搞node我就是不劝你你也搞不了。
@@ -41,6 +48,7 @@ description: 介绍一个基于gulp工程化的nodejs中间层种子项目
 7. 你的项目已经跑起来了，不信，去浏览器访问localhost:8000试试。
 
 ### how to START?
+
 执行start缘何能启动整个项目呢，不妨从源码上一点点看：
 
 	
@@ -135,7 +143,9 @@ description: 介绍一个基于gulp工程化的nodejs中间层种子项目
 	}
 
 ### how to BUILD?
+
 从上面可以看出，整个项目启动会根据是否处于调试环境而决定启动的是src还是dist里面的app程序。
+
 dist目录是通过执行gulpfile里面的default task来进行的。
 
 我们再来研读下gulpfile的工作。
@@ -213,6 +223,7 @@ dist目录是通过执行gulpfile里面的default task来进行的。
 	gulp.task('default', ['clean', 'build']);
 
 ### how to RUN APP?
+
 浏览完整个构建流程之后，我们知道项目里后端层面的代码都是没有变化的，那么我们可以正常阅读整个app入口来知晓express项目是如何启动的。
 
 	/*
@@ -274,6 +285,7 @@ dist目录是通过执行gulpfile里面的default task来进行的。
 这个文件没有常规的执行app.listen这个操作来启动服务，因为这里还是视作最外层sstart启动模块的依赖模块。他export出去后被start里面调用。
 
 ### how to OPERATION A REQUEST?
+
 我们从最初一个请求开始，到返回给客户端一个页面。
 
 顺序研究一遍！
@@ -306,6 +318,7 @@ dist目录是通过执行gulpfile里面的default task来进行的。
 
 
 ### 然后，没有然后了
+
 如果你能完整完成这个项目的架构，你应该是一个真正意义上的合格的前端了！
 
 这么说，我感觉这个seed项目很值钱，你们下载一次就该支付宝转账给我钱。
