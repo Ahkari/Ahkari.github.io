@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  你自己的基于gulp的express中间渲染层
+title:  搭建你的express中间层！
 category: 技术
 tags: nodejs express gulp
 description: 介绍一个基于gulp工程化的nodejs中间层种子项目
